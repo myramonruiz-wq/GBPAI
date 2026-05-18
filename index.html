@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#1a6b3a" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="GBP Growth" />
+<meta name="description" content="AI-powered Google Business Profile growth tools" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-192.svg" />
+<title>GBP Growth System</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --green: #1a6b3a;
+    --green-dark: #155730;
+    --green-light: #e1f5ea;
+    --text: #111;
+    --text-secondary: #555;
+    --text-tertiary: #999;
+    --surface: #fff;
+    --surface-2: #f5f5f4;
+    --border: rgba(0,0,0,0.1);
+    --border-medium: rgba(0,0,0,0.18);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text: #f0f0ef;
+      --text-secondary: #aaa;
+      --text-tertiary: #666;
+      --surface: #1c1c1e;
+      --surface-2: #2c2c2e;
+      --border: rgba(255,255,255,0.1);
+      --border-medium: rgba(255,255,255,0.18);
+      --green-light: #0f3d22;
+    }
+  }
+
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--surface-2);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* STATUS BAR SPACER */
+  .status-bar { height: env(safe-area-inset-top, 0px); background: var(--green); }
+
+  /* HEADER */
+  .app-header {
+    background: var(--green);
+    padding: 14px 16px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .app-header-icon { font-size: 22px; }
+  .app-header h1 { font-size: 17px; font-weight: 600; color: white; letter-spacing: -0.3px; }
+  .app-header p { font-size: 11px; color: rgba(255,255,255,0.75); margin-top: 1px; }
+
+  /* SCROLL AREA */
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 16px calc(80px + var(--safe-bottom));
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    background: var(--surface);
+    border-top: 0.5px solid var(--border);
+    display: flex;
+    padding-bottom: var(--safe-bottom);
+    flex-shrink: 0;
+    z-index: 100;
+  }
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 4px 8px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text-tertiary);
+    font-size: 10px;
+    font-family: inherit;
+    gap: 3px;
+    transition: color 0.15s;
+  }
+  .nav-btn .nav-icon { font-size: 22px; line-height: 1; }
+  .nav-btn.active { color: var(--green); }
+
+  /* PANELS */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* FORM ELEMENTS */
+  .field { margin-bottom: 14px; }
+  .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+    display: block;
+  }
+  input[type="text"], textarea, select {
+    width: 100%;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--surface);
+    border: 0.5px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    padding: 11px 13px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color 0.15s;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus { border-color: var(--green); }
+  textarea { min-height: 88px; resize: vertical; line-height: 1.5; }
+  select { height: 44px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 13px center; padding-right: 36px; }
+
+  /* BUTTONS */
+  .btn-primary {
+    width: 100%;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s, transform 0.1s;
+    margin-top: 4px;
+  }
+  .btn-primary:active { background: var(--green-dark); transform: scale(0.98); }
+  .btn-primary:disabled { background: var(--surface-2); color: var(--text-tertiary); border: 0.5px solid var(--border); transform: none; }
+
+  .btn-secondary {
+    width: 100%;
+    background: var(--surface);
+    color: var(--text);
+    border: 0.5px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.15s;
+  }
+  .btn-secondary:active { background: var(--surface-2); }
+
+  /* OUTPUT BOX */
+  .output-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    margin-top: 14px;
+  }
+  .output-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+  .output-text {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .output-placeholder { color: var(--text-tertiary); font-style: italic; font-size: 14px; }
+  .output-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .output-actions .btn-secondary { flex: 1; padding: 10px; font-size: 13px; }
+
+  /* STAR RATING */
+  .star-row { display: flex; gap: 8px; padding: 6px 0; }
+  .star { font-size: 30px; color: var(--border-medium); cursor: pointer; transition: color 0.1s; line-height: 1; }
+  .star.active { color: #f59e0b; }
+
+  /* ROW 2 */
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* SPINNER */
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.35);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TIP CARDS */
+  .tip-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .tip-icon {
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .tip-icon.green { background: var(--green-light); }
+  .tip-icon.blue { background: #e8f1fb; }
+  .tip-icon.amber { background: #fef3e1; }
+  .tip-body { flex: 1; }
+  .tip-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .tip-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.55; }
+
+  /* CHAR COUNT */
+  .char-info { font-size: 11px; color: var(--text-tertiary); margin-top: 6px; text-align: right; }
+
+  /* SECTION HEADER */
+  .section-header { margin-bottom: 16px; }
+  .section-header h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
+  .section-header p { font-size: 13px; color: var(--text-secondary); margin-top: 3px; }
+
+  /* INSTALL BANNER */
+  .install-banner {
+    background: var(--green-light);
+    border: 0.5px solid rgba(26,107,58,0.25);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--green-dark);
+  }
+  .install-banner button {
+    margin-left: auto;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .install-banner { color: #7dd4a8; border-color: rgba(26,107,58,0.4); }
+    .tip-icon.blue { background: #1a2d40; }
+    .tip-icon.amber { background: #2d2010; }
+    select { background-color: var(--surface); }
+  }
+</style>
+</head>
+<body>
+<div class="status-bar"></div>
+
+<div class="app-header">
+  <div class="app-header-icon">📍</div>
+  <div>
+    <h1>GBP Growth System</h1>
+    <p>AI-powered Google Business Profile tools</p>
+  </div>
+</div>
+
+<div class="scroll-area" id="scroll-area">
+
+  <!-- POSTS PANEL -->
+  <div class="panel active" id="panel-posts">
+    <div class="section-header">
+      <h2>Post Generator</h2>
+      <p>Create engaging GBP posts in seconds</p>
+    </div>
+    <div id="install-prompt" class="install-banner" style="display:none">
+      📲 <span>Add to your home screen for quick access</span>
+      <button onclick="installApp()">Install</button>
+    </div>
+    <div class="field">
+      <label class="field-label">Business name &amp; type</label>
+      <input type="text" id="post-business" placeholder="e.g. Ray's Auto Repair — mechanic" />
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="field-label">Post type</label>
+        <select id="post-type">
+          <option value="update">What's new</option>
+          <option value="offer">Offer / Promo</option>
+          <option value="event">Event</option>
+          <option value="product">Product</option>
+          <option value="seasonal">Seasonal</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">Tone</label>
+        <select id="post-tone">
+          <option value="friendly">Friendly</option>
+          <option value="professional">Professional</option>
+          <option value="urgent">Urgent</option>
+          <option value="local">Local</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Key details / topic</label>
+      <textarea id="post-details" placeholder="e.g. 20% off oil changes this month, synthetic oil, free tire rotation…"></textarea>
+    </div>
+    <button class="btn-primary" id="post-btn" onclick="generatePost()">✨ Generate Post</button>
+    <div class="output-card" id="post-card" style="display:none">
+      <div class="output-label">Generated Post</div>
+      <div class="output-text" id="post-output"></div>
+      <div class="char-info" id="post-chars"></div>
+      <div class="output-actions">
+        <button class="btn-secondary" onclick="copyText('post-output')">📋 Copy</button>
+        <button class="btn-secondary" onclick="generatePost()">↻ Regenerate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVIEWS PANEL -->
+  <div class="panel" id="panel-reviews">
+    <div class="section-header">
+      <h2>Review Responder</h2>
+      <p>Craft the perfect owner response</p>
+    </div>
+    <div class="field">
+      <label class="field-label">Business name</label>
+      <input type="text" id="rev-business" placeholder="e.g. Sunshine Dental" />
+    </div>
+    <div class="field">
+      <label class="field-label">Star rating</label>
+      <div class="star-row" id="star-row">
+        <span class="star" onclick="setStar(1)">★</span>
+        <span class="star" onclick="setStar(2)">★</span>
+        <span class="star" onclick="setStar(3)">★</span>
+        <span class="star" onclick="setStar(4)">★</span>
+        <span class="star active" onclick="setStar(5)">★</span>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Customer review</label>
+      <textarea id="rev-text" placeholder="Paste the customer's review here…"></textarea>
+    </div>
+    <div class="field">
+      <label class="field-label">Response style</label>
+      <select id="rev-style">
+        <option value="warm">Warm &amp; personal</option>
+        <option value="professional">Professional</option>
+        <option value="brief">Brief &amp; friendly</option>
+        <option value="apologetic">Apologetic (negative)</option>
+      </select>
+    </div>
+    <button class="btn-primary" id="rev-btn" onclick="generateReview()">✨ Generate Response</button>
+    <div class="output-card" id="rev-card" style="display:none">
+      <div class="output-label">Owner Response</div>
+      <div class="output-text" id="rev-output"></div>
+      <div class="output-actions">
+        <button class="btn-secondary" onclick="copyText('rev-output')">📋 Copy</button>
+        <button class="btn-secondary" onclick="generateReview()">↻ Regenerate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTIMIZER PANEL -->
+  <div class="panel" id="panel-optimizer">
+    <div class="section-header">
+      <h2>Profile Optimizer</h2>
+      <p>Get a full SEO audit &amp; rewrite</p>
+    </div>
+    <div class="field">
+      <label class="field-label">Business name</label>
+      <input type="text" id="opt-name" placeholder="e.g. Bloom Flower Studio" />
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="field-label">Category</label>
+        <input type="text" id="opt-category" placeholder="e.g. Florist" />
+      </div>
+      <div class="field">
+        <label class="field-label">City / Area</label>
+        <input type="text" id="opt-city" placeholder="e.g. Oviedo, FL" />
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Current description (optional)</label>
+      <textarea id="opt-desc" placeholder="Paste your current GBP description, or leave blank…"></textarea>
+    </div>
+    <div class="field">
+      <label class="field-label">Top services or products</label>
+      <input type="text" id="opt-services" placeholder="e.g. weddings, same-day delivery, custom arrangements" />
+    </div>
+    <button class="btn-primary" id="opt-btn" onclick="generateOptimizer()">✨ Analyze &amp; Optimize</button>
+    <div class="output-card" id="opt-card" style="display:none">
+      <div class="output-label">Optimization Report</div>
+      <div class="output-text" id="opt-output"></div>
+      <div class="output-actions">
+        <button class="btn-secondary" onclick="copyText('opt-output')">📋 Copy</button>
+        <button class="btn-secondary" onclick="generateOptimizer()">↻ Regenerate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q&A PANEL -->
+  <div class="panel" id="panel-qa">
+    <div class="section-header">
+      <h2>Q&amp;A Generator</h2>
+      <p>Seed your profile before customers ask</p>
+    </div>
+    <div class="field">
+      <label class="field-label">Business name &amp; type</label>
+      <input type="text" id="qa-business" placeholder="e.g. Peak Fitness Gym" />
+    </div>
+    <div class="field">
+      <label class="field-label">Key services / details</label>
+      <textarea id="qa-details" placeholder="e.g. personal training, group classes, 24/7, $29/mo membership, parking…"></textarea>
+    </div>
+    <div class="field">
+      <label class="field-label">How many Q&amp;As</label>
+      <select id="qa-count">
+        <option value="5">5 questions</option>
+        <option value="8" selected>8 questions</option>
+        <option value="10">10 questions</option>
+      </select>
+    </div>
+    <button class="btn-primary" id="qa-btn" onclick="generateQA()">✨ Generate Q&amp;As</button>
+    <div class="output-card" id="qa-card" style="display:none">
+      <div class="output-label">Q&amp;A Pairs</div>
+      <div class="output-text" id="qa-output"></div>
+      <div class="output-actions">
+        <button class="btn-secondary" onclick="copyText('qa-output')">📋 Copy</button>
+        <button class="btn-secondary" onclick="generateQA()">↻ Regenerate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIPS PANEL -->
+  <div class="panel" id="panel-tips">
+    <div class="section-header">
+      <h2>Growth Tips</h2>
+      <p>2025 best practices to rank higher</p>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon green">⭐</div>
+      <div class="tip-body">
+        <div class="tip-title">Reply to every review within 24h</div>
+        <div class="tip-desc">Google rewards active engagement. Responding to all reviews signals trust and lifts your local ranking.</div>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon green">✏️</div>
+      <div class="tip-body">
+        <div class="tip-title">Post at least once per week</div>
+        <div class="tip-desc">Regular posts keep your profile fresh. Mix updates, offers, and behind-the-scenes content for best results.</div>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon blue">📸</div>
+      <div class="tip-body">
+        <div class="tip-title">Add new photos every week</div>
+        <div class="tip-desc">Profiles with photos get 42% more direction requests. Upload real photos of your team, space, and work.</div>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon blue">💬</div>
+      <div class="tip-body">
+        <div class="tip-title">Seed your own Q&amp;A section</div>
+        <div class="tip-desc">You can ask and answer your own questions. Use the Q&amp;A tab to generate and post them yourself.</div>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon amber">📍</div>
+      <div class="tip-body">
+        <div class="tip-title">Use local keywords naturally</div>
+        <div class="tip-desc">Include your city and neighborhood in your description. "Orlando florist near UCF" beats generic descriptions.</div>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon amber">🕐</div>
+      <div class="tip-body">
+        <div class="tip-title">Keep hours 100% accurate</div>
+        <div class="tip-desc">Inaccurate hours hurt trust and ranking. Update holiday hours proactively every single time.</div>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon green">🏷️</div>
+      <div class="tip-body">
+        <div class="tip-title">Add all relevant secondary categories</div>
+        <div class="tip-desc">Most businesses only set one category. Adding 3–5 relevant secondary categories expands your search reach significantly.</div>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon blue">🔗</div>
+      <div class="tip-body">
+        <div class="tip-title">Build local citations consistently</div>
+        <div class="tip-desc">Ensure your NAP (name, address, phone) is identical across Yelp, Facebook, Apple Maps, and industry directories.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab('posts', this)">
+    <span class="nav-icon">✏️</span>Posts
+  </button>
+  <button class="nav-btn" onclick="switchTab('reviews', this)">
+    <span class="nav-icon">⭐</span>Reviews
+  </button>
+  <button class="nav-btn" onclick="switchTab('optimizer', this)">
+    <span class="nav-icon">📊</span>Optimize
+  </button>
+  <button class="nav-btn" onclick="switchTab('qa', this)">
+    <span class="nav-icon">💬</span>Q&amp;A
+  </button>
+  <button class="nav-btn" onclick="switchTab('tips', this)">
+    <span class="nav-icon">💡</span>Tips
+  </button>
+</nav>
+
+<script>
+let starRating = 5;
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-prompt').style.display = 'flex';
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      document.getElementById('install-prompt').style.display = 'none';
+      deferredPrompt = null;
+    });
+  }
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('scroll-area').scrollTop = 0;
+}
+
+function setStar(n) {
+  starRating = n;
+  document.querySelectorAll('#star-row .star').forEach((s, i) => {
+    s.classList.toggle('active', i < n);
+  });
+}
+
+function setLoading(btnId, loading, originalHTML) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.innerHTML = loading
+    ? '<div class="spinner"></div> Generating…'
+    : originalHTML;
+}
+
+function showOutput(cardId, outputId, text) {
+  const card = document.getElementById(cardId);
+  card.style.display = 'block';
+  document.getElementById(outputId).textContent = text;
+  if (outputId === 'post-output') {
+    document.getElementById('post-chars').textContent = text.length + ' / 1500 characters';
+  }
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function copyText(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const el = document.getElementById(id);
+    const prev = el.style.opacity;
+    el.style.opacity = '0.5';
+    setTimeout(() => { el.style.opacity = prev || '1'; }, 300);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+}
+
+async function callClaude(prompt) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content?.[0]?.text || '';
+}
+
+async function generatePost() {
+  const business = document.getElementById('post-business').value.trim();
+  const type = document.getElementById('post-type').value;
+  const tone = document.getElementById('post-tone').value;
+  const details = document.getElementById('post-details').value.trim();
+  if (!business) { alert('Please enter your business name.'); return; }
+  setLoading('post-btn', true);
+  try {
+    const result = await callClaude(`You are a Google Business Profile expert. Write a compelling GBP post.
+Business: ${business}
+Post type: ${type}
+Tone: ${tone}
+Key details: ${details || 'General business update'}
+Rules: Under 1500 characters. Start with a hook. Include a clear CTA. Sound human. No hashtags. Output ONLY the post text.`);
+    showOutput('post-card', 'post-output', result);
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+  setLoading('post-btn', false, '✨ Generate Post');
+}
+
+async function generateReview() {
+  const business = document.getElementById('rev-business').value.trim();
+  const review = document.getElementById('rev-text').value.trim();
+  const style = document.getElementById('rev-style').value;
+  if (!review) { alert('Please paste a customer review.'); return; }
+  setLoading('rev-btn', true);
+  try {
+    const result = await callClaude(`You are a Google Business Profile expert. Write an owner response to this review.
+Business: ${business || 'the business'}
+Star rating: ${starRating}/5
+Review: "${review}"
+Style: ${style}
+Rules: Under 200 words. Address specific points. Sound genuine, not scripted. No canned phrases. Output ONLY the response.`);
+    showOutput('rev-card', 'rev-output', result);
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+  setLoading('rev-btn', false, '✨ Generate Response');
+}
+
+async function generateOptimizer() {
+  const name = document.getElementById('opt-name').value.trim();
+  const category = document.getElementById('opt-category').value.trim();
+  const city = document.getElementById('opt-city').value.trim();
+  const desc = document.getElementById('opt-desc').value.trim();
+  const services = document.getElementById('opt-services').value.trim();
+  if (!name || !category) { alert('Please enter business name and category.'); return; }
+  setLoading('opt-btn', true);
+  try {
+    const result = await callClaude(`You are a local SEO and GBP expert. Provide a complete optimization report.
+Business: ${name} | Category: ${category} | Location: ${city || 'not specified'}
+Current description: ${desc || 'none'}
+Top services: ${services || 'not specified'}
+Provide:
+1. OPTIMIZED DESCRIPTION (150-300 words, keyword-rich, local SEO focused)
+2. TOP 5 PROFILE FIXES (specific, actionable)
+3. RECOMMENDED CATEGORIES (primary + 3-5 secondary)
+4. LOCAL KEYWORDS TO TARGET (10 specific search phrases)
+Format with these exact headings. Be specific and actionable.`);
+    showOutput('opt-card', 'opt-output', result);
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+  setLoading('opt-btn', false, '✨ Analyze & Optimize');
+}
+
+async function generateQA() {
+  const business = document.getElementById('qa-business').value.trim();
+  const details = document.getElementById('qa-details').value.trim();
+  const count = document.getElementById('qa-count').value;
+  if (!business) { alert('Please enter your business name.'); return; }
+  setLoading('qa-btn', true);
+  try {
+    const result = await callClaude(`You are a GBP expert. Generate ${count} Q&A pairs for this business's GBP Q&A section.
+Business: ${business}
+Details: ${details || 'general business'}
+Rules: Questions should be what real customers ask. Answers keyword-rich, under 125 words. Cover: hours, pricing, parking, services, uniqueness, booking.
+Format:
+Q: [question]
+A: [answer]
+
+(blank line between pairs)
+Output ONLY the Q&A pairs.`);
+    showOutput('qa-card', 'qa-output', result);
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+  setLoading('qa-btn', false, '✨ Generate Q&As');
+}
+</script>
+</body>
+</html>
