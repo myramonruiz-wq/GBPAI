@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="GBP Growth" />
 <meta name="description" content="AI-powered Google Business Profile growth tools" />
-<link rel="manifest" href="manifest.json" />
+<link rel="manifest" href="/GBPAI/manifest.json" />
 <link rel="apple-touch-icon" href="icon-192.svg" />
 <title>GBP Growth System</title>
 <style>
@@ -654,7 +654,7 @@ function installApp() {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker.register('/GBPAI/sw.js').catch(() => {});
 }
 
 function switchTab(name, btn) {
