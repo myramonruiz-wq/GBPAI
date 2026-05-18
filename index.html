@@ -295,17 +295,64 @@
     .tip-icon.amber { background: #2d2010; }
     select { background-color: var(--surface); }
   }
+
+  /* API KEY SCREEN */
+  .apikey-screen {
+    position: fixed; inset: 0; z-index: 999;
+    background: var(--surface-2);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .apikey-screen.hidden { display: none; }
+  .apikey-logo { font-size: 56px; margin-bottom: 16px; }
+  .apikey-screen h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .apikey-screen p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px; }
+  .apikey-screen input {
+    width: 100%; font-family: inherit; font-size: 14px;
+    background: var(--surface); color: var(--text);
+    border: 0.5px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    padding: 13px; margin-bottom: 12px;
+    outline: none; letter-spacing: 0.03em;
+  }
+  .apikey-screen input:focus { border-color: var(--green); }
+  .apikey-hint { font-size: 12px; color: var(--text-tertiary); margin-top: 12px; line-height: 1.5; }
+  .apikey-hint a { color: var(--green); text-decoration: none; }
+  .key-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--green-light); color: var(--green);
+    font-size: 12px; font-weight: 600;
+    padding: 4px 10px; border-radius: 99px;
+    cursor: pointer; border: none; font-family: inherit;
+    position: absolute; top: 16px; right: 16px;
+  }
 </style>
 </head>
 <body>
+<!-- API KEY SETUP SCREEN -->
+<div class="apikey-screen" id="apikey-screen">
+  <div class="apikey-logo">📍</div>
+  <h2>GBP Growth System</h2>
+  <p>Enter your Anthropic API key to get started. It's saved on your device only and never shared.</p>
+  <input type="password" id="apikey-input" placeholder="sk-ant-api03-…" autocomplete="off" autocorrect="off" spellcheck="false" />
+  <button class="btn-primary" onclick="saveApiKey()" style="margin-top:0">Save &amp; Continue →</button>
+  <p class="apikey-hint">
+    Get a free API key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br/>
+    Your key is stored locally on this device only.
+  </p>
+</div>
+
 <div class="status-bar"></div>
 
-<div class="app-header">
+<div class="app-header" style="position:relative">
   <div class="app-header-icon">📍</div>
   <div>
     <h1>GBP Growth System</h1>
     <p>AI-powered Google Business Profile tools</p>
   </div>
+  <button class="key-badge" onclick="changeApiKey()" title="Change API key">🔑 Key</button>
 </div>
 
 <div class="scroll-area" id="scroll-area">
@@ -565,6 +612,30 @@
 <script>
 let starRating = 5;
 let deferredPrompt = null;
+let apiKey = localStorage.getItem('gbp_api_key') || '';
+
+// Show API key screen if no key saved
+if (!apiKey) {
+  document.getElementById('apikey-screen').classList.remove('hidden');
+} else {
+  document.getElementById('apikey-screen').classList.add('hidden');
+}
+
+function saveApiKey() {
+  const key = document.getElementById('apikey-input').value.trim();
+  if (!key.startsWith('sk-ant-')) {
+    alert('Please enter a valid Anthropic API key (starts with sk-ant-)');
+    return;
+  }
+  apiKey = key;
+  localStorage.setItem('gbp_api_key', key);
+  document.getElementById('apikey-screen').classList.add('hidden');
+}
+
+function changeApiKey() {
+  document.getElementById('apikey-input').value = apiKey;
+  document.getElementById('apikey-screen').classList.remove('hidden');
+}
 
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
@@ -639,7 +710,12 @@ function copyText(id) {
 async function callClaude(prompt) {
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
