@@ -1,10 +1,10 @@
 const CACHE = 'gbp-growth-v1';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.svg',
-  '/icon-512.svg'
+  '/GBPAI/',
+  '/GBPAI/index.html',
+  '/GBPAI/manifest.json',
+  '/GBPAI/icon-192.svg',
+  '/GBPAI/icon-512.svg'
 ];
 
 self.addEventListener('install', e => {
